@@ -10,9 +10,6 @@
 
 Timer t;
 
-//creating an object of serial class
-//so that we can communicate with PC
-//Serial pc(SERIAL_TX, SERIAL_RX);
 //setting LED1 to give digital output
 DigitalOut myled(LED1);
 //creating onject of MPU6050 class
@@ -21,13 +18,8 @@ PwmOut servoA(D11);
 PwmOut servoB(D10);
 
 float elapsedTime, currentTime, previousTime;
-float kp = 1;
-float ki = 1;
-float kd = 1;
 float dutyCycleA, dutyCycleB;
-float angleX, angleY, angleZ, accAngleX, accAngleY, accelX, accelY, accelZ;;
-float valueX = 110;
-float valueY = 150;
+float angleX, angleY, angleZ, accelX, accelY, accelZ;;
 float angleXSample1, angleXSample2, angleXSample3, angleXAvg;
 float angleYSample1, angleYSample2, angleYSample3, angleYAvg;
 float angleZSample1, angleZSample2, angleZSample3, angleZAvg;
@@ -39,6 +31,7 @@ float rad_to_deg(float rad) {
 void initServo()
 {
     servoA.period_ms(PERIOD);
+    servoB.period_ms(PERIOD);
 
     return;
 }
@@ -73,13 +66,16 @@ int main()
             return(0);
         }
 
+        //setting gyro and accelerometer range
         mpu.setGyroRange(0);
         mpu.setAcceleroRange(0);
         
+        //getting elapsed time, uses timer, allows going from rad/s to just rad for angle
         previousTime = currentTime;
         currentTime = t.read_ms();
         elapsedTime = (currentTime - previousTime) / 1000;
 
+        //temperature readings
         float temp = mpu.getTemp();
         printf("temprature = %0.2f ^C\r\n",temp);
 
@@ -112,6 +108,7 @@ int main()
             }
         }
 
+        //averaging sample gyro data
         angleXAvg = (angleXSample1 + angleXSample2 + angleXSample3) / 3;
         angleYAvg = (angleYSample1 + angleYSample2 + angleYSample3) / 3;
         angleZAvg = (angleZSample1 + angleZSample2 + angleZSample3) / 3;
